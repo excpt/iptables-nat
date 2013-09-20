@@ -1,0 +1,43 @@
+#!/bin/sh
+echo "\n\nSETTING UP IPTABLES NAT"
+IF_INTERN="eth1"
+IF_EXTERN="eth0"
+
+IF_INTERN_IP="$(ifconfig $IF_INTERN | grep 'inet addr' | awk '{print $2}' | sed -e 's/.*://')"
+IF_EXTERN_IP="$(ifconfig $IF_EXTERN | grep 'inet addr' | awk '{print $2}' | sed -e 's/.*://')"
+
+echo "  Loading required stateful/NAT kernel modules..."
+
+/sbin/depmod -a
+/sbin/modprobe ip_tables
+/sbin/modprobe ip_conntrack
+/sbin/modprobe ip_conntrack_ftp
+/sbin/modprobe ip_conntrack_irc
+/sbin/modprobe iptable_nat
+/sbin/modprobe ip_nat_ftp
+/sbin/modprobe ip_nat_irc
+/sbin/modprobe ipt_LOG
+
+echo "  Configurating system parameters..."
+
+echo "1" > /proc/sys/net/ipv4/ip_forward
+echo "1" > /proc/sys/net/ipv4/ip_dynaddr
+
+echo "  External interface: $IF_EXTERN ($IF_EXTERN_IP)"
+echo "  Internal interface: $IF_INTERN ($IF_INTERN_IP)"
+
+echo "  Loading iptables rule sets..."
+
+iptables -P INPUT ACCEPT
+iptables -F INPUT
+iptables -P OUTPUT ACCEPT
+iptables -F OUTPUT
+iptables -P FORWARD DROP
+iptables -F FORWARD
+iptables -t nat -F
+
+iptables -A FORWARD -i $IF_EXTERN -o $IF_INTERN -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A FORWARD -i $IF_INTERN -o $IF_EXTERN -j ACCEPT
+iptables -t nat -A POSTROUTING -o $IF_EXTERN -j MASQUERADE
+
+echo "\n  DONE.\n\n"
