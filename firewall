@@ -28,16 +28,16 @@ echo "  Internal interface: $IF_INTERN ($IF_INTERN_IP)"
 
 echo "  Loading iptables rule sets..."
 
-iptables -P INPUT ACCEPT
-iptables -F INPUT
-iptables -P OUTPUT ACCEPT
-iptables -F OUTPUT
-iptables -P FORWARD DROP
-iptables -F FORWARD
-iptables -t nat -F
+/sbin/iptables -P INPUT ACCEPT
+/sbin/iptables -F INPUT
+/sbin/iptables -P OUTPUT ACCEPT
+/sbin/iptables -F OUTPUT
+/sbin/iptables -P FORWARD DROP
+/sbin/iptables -F FORWARD
+/sbin/iptables -t nat -F
 
-iptables -A FORWARD -i $IF_EXTERN -o $IF_INTERN -m state --state ESTABLISHED,RELATED -j ACCEPT
-iptables -A FORWARD -i $IF_INTERN -o $IF_EXTERN -j ACCEPT
-iptables -t nat -A POSTROUTING -o $IF_EXTERN -j MASQUERADE
+/sbin/iptables -A FORWARD -i $IF_EXTERN -o $IF_INTERN -m state --state ESTABLISHED,RELATED -j ACCEPT
+/sbin/iptables -A FORWARD -i $IF_INTERN -o $IF_EXTERN -j ACCEPT
+/sbin/iptables -t nat -A POSTROUTING -o $IF_EXTERN -j MASQUERADE
 
 echo "\n  DONE.\n\n"
