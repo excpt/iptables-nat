@@ -3,8 +3,8 @@ echo "\n\nSETTING UP IPTABLES NAT"
 IF_INTERN="eth1"
 IF_EXTERN="eth0"
 
-IF_INTERN_IP="$(ifconfig $IF_INTERN | grep 'inet addr' | awk '{print $2}' | sed -e 's/.*://')"
-IF_EXTERN_IP="$(ifconfig $IF_EXTERN | grep 'inet addr' | awk '{print $2}' | sed -e 's/.*://')"
+IF_INTERN_IP="$(/sbin/ifconfig $IF_INTERN | grep 'inet addr' | awk '{print $2}' | sed -e 's/.*://')"
+IF_EXTERN_IP="$(/sbin/ifconfig $IF_EXTERN | grep 'inet addr' | awk '{print $2}' | sed -e 's/.*://')"
 
 echo "  Loading required stateful/NAT kernel modules..."
 
